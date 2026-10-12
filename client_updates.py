@@ -47,7 +47,12 @@ def install(app, db, auth, user, notice, fail, one, rows):
 
     @app.after_request
     def enrich_events(response):
-        if response.is_json and response.status_code == 200:
+        if (
+            request.path.startswith('/api/')
+            and response.is_json
+            and response.status_code == 200
+            and not response.direct_passthrough
+            ): 
             def enrich(value):
                 if isinstance(value, list):
                     return [enrich(v) for v in value]
